@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="2dp"
+    android:layout_width="50dp"
+    android:layout_height="50dp">
+
+    <ImageView
+            android:id="@+id/image"
+            tools:src="@drawable/earthquake"
+            android:layout_width="@dimen/custom_point_image"
+            android:layout_height="@dimen/custom_point_image"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+            android:id="@id/amu_text"
+            tools:text="500"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_dark"
+            android:layout_margin="4dp"
+            android:paddingLeft="@dimen/custom_point_padding"
+            android:paddingRight="@dimen/custom_point_padding"
+            android:layout_gravity="end"
+            android:alpha=".8"/>
+
+</FrameLayout>

@@ -1,0 +1,15 @@
+<resources xmlns:xliff="http://schemas.android.com/tools">
+    <string name="app_name">Earthquakes</string>
+    <string name="title_map">Map</string>
+    <string name="title_countries">Countries</string>
+    <string name="title_earthquakes">Earthquakes</string>
+    <string name="permission_denied">Permission denied!</string>
+    <!-- google maps Api key -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAg-yfxtVXPil9vS1vHdyjxEI1zknr2SFo</string>
+    <string name="format_depth">Depth:<xliff:g id="depth">%1.1f</xliff:g> Lng:<xliff:g id="lng">%2.2f</xliff:g> Lat:<xliff:g id="lat">%3.2f</xliff:g></string>
+    <string name="format_title" translatable="false"><xliff:g id="code">%1$s</xliff:g> Earthquake</string>
+    <string name="click_detail">Click for details</string>
+    <string name="self_position">Current Position</string>
+    <string name="nothing_found">Nothing found!</string>
+    <string name="format_found_points">Found <xliff:g id="code">%1$s</xliff:g> points!</string>
+</resources>
