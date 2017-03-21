@@ -28,9 +28,9 @@ public class MarkerInfoWindowAdapter extends BaseInfoWindowAdapter {
         ImageView markerBadge = (ImageView) view.findViewById(R.id.badge);
         TextView markerTitle = (TextView)view.findViewById(R.id.title);
         TextView markerSnippet = (TextView)view.findViewById(R.id.snippet);
-        markerBadge.setImageResource(R.drawable.earthquake);
+        markerBadge.setImageResource(R.drawable.earthquake_yellow);
         if (!TextUtils.isEmpty(marker.getTitle())) {
-            markerTitle.setText(context.getString(R.string.format_title,marker.getTitle()));
+            markerTitle.setText(context.getString(R.string.format_adapter_earthquake, marker.getTitle()));
         }
         int startClickLength = context.getString(R.string.click_detail).length();
         if (!TextUtils.isEmpty(marker.getSnippet())) {

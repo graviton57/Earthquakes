@@ -27,6 +27,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
+import com.havrylyuk.earthquakes.map.DetailInfoWindowAdapter;
+import com.havrylyuk.earthquakes.map.MarkerInfoWindowAdapter;
 import com.havrylyuk.earthquakes.util.Utility;
 
 
@@ -44,6 +46,7 @@ public class DetailActivity extends BaseActivity  implements
     private TextView locationView;
     private TextView distanceView;
     private GoogleMap map;
+    private float magnitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class DetailActivity extends BaseActivity  implements
         map = googleMap;
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         map.getUiSettings().setMapToolbarEnabled(true);
+        map.setInfoWindowAdapter(new DetailInfoWindowAdapter(this));
         getSupportLoaderManager().initLoader(DETAIL_LOADER, null, this);
     }
 
@@ -141,7 +145,7 @@ public class DetailActivity extends BaseActivity  implements
         LatLng latLng = new LatLng(lat, lng);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(getString(R.string.self_position));
+        markerOptions.title(getString(R.string.format_magnitude, magnitude));
         markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.earthquake));
         map.addMarker(markerOptions);
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, 5);
@@ -153,7 +157,7 @@ public class DetailActivity extends BaseActivity  implements
         if (loader.getId() == DETAIL_LOADER) {
             if (cursor != null && cursor.moveToFirst()) {
                 int pointId = cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID));
-                float magnitude = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
+                magnitude = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
                 float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
                 float lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
                 String location = getCountry() + "," + getRegion() + ", " + getCurrentCity();

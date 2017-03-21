@@ -51,7 +51,7 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
     private GoogleMap map;
     private ClusterManager<PointItem> clusterManager;
     private PointItem destinationPoint; //destination position
-    Marker currLocationMarker;//original user position
+    private Marker currLocationMarker;//original user position
     private Location lastLocation;
 
     public EarthquakesMapFragment() {
@@ -182,15 +182,4 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
         startActivity(intent);
     }
 
-    /*@Override
-    public void onLocationChanged(Location location) {
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        addLocationMarker(location);
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(11));
-        parseLocation(location);
-        if (googleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        }
-    }*/
 }

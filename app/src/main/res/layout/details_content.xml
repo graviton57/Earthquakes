@@ -9,6 +9,8 @@
 
     <TextView
         android:id="@+id/point_location"
+        android:drawableLeft="@drawable/earth"
+        android:drawablePadding="5dp"
         style="?android:attr/textAppearanceMedium"
         android:textColor="@color/colorPrimary"
         android:layout_height="wrap_content"
@@ -49,7 +51,7 @@
 
     <TextView
         android:id="@+id/point_lng_lat"
-        android:drawableLeft="@drawable/map_marker"
+        android:drawableLeft="@drawable/location"
         android:drawablePadding="5dp"
         style="?android:attr/textAppearanceSmall"
         android:layout_width="match_parent"
