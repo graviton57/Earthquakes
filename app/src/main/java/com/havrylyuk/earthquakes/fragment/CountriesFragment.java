@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.adapter.CountriesAdapter;
@@ -74,13 +75,12 @@ public class CountriesFragment extends Fragment implements LoaderManager.LoaderC
         countriesAdapter = new CountriesAdapter(new CountriesAdapter.ItemClickListener() {
             @Override
             public void onItemClick(long id) {
-
+                Toast.makeText(getActivity(),"Show list "+id,Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.setAdapter(countriesAdapter);
 
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

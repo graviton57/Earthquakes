@@ -15,8 +15,6 @@ public class Earthquake {
     private String eqid;
     private double magnitude;
     private float lat;
-    @Expose
-    private String location;
 
     public Earthquake() {
     }
@@ -77,11 +75,4 @@ public class Earthquake {
         this.lat = lat;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
 }

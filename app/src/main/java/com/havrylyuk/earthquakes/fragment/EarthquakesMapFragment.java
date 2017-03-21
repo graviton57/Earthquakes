@@ -3,7 +3,6 @@ package com.havrylyuk.earthquakes.fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -32,7 +31,7 @@ import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.activity.DetailActivity;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 import com.havrylyuk.earthquakes.map.ClusterRenderer;
-import com.havrylyuk.earthquakes.map.MarkerInfoWindowAdapter;
+import com.havrylyuk.earthquakes.map.MarkersInfoWindowAdapter;
 import com.havrylyuk.earthquakes.map.PointItem;
 
 /**
@@ -95,9 +94,11 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
                     float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
                     LatLng point = new LatLng(lat, lng);
                     PointItem pointItem = new PointItem(point);
+                    pointItem.setId(cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID)));
                     float m = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
                     pointItem.setIcon(m >= 5 ? R.drawable.earthquake:R.drawable.earthquake_low);
-                    pointItem.setId(cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID)));
+                    pointItem.setMagnitude(cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE)));
+                    pointItem.setSrc(cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_SRC)));
                     latLngBuilder.include(point);
                     clusterManager.addItem(pointItem);
                 } while (cursor.moveToNext());
@@ -151,7 +152,7 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
         clusterManager.setOnClusterClickListener(this);
         clusterManager.setOnClusterInfoWindowClickListener(this);
         clusterManager.getMarkerCollection()
-                .setOnInfoWindowAdapter( new MarkerInfoWindowAdapter(getActivity()));
+                .setOnInfoWindowAdapter( new MarkersInfoWindowAdapter(getActivity()));
         getActivity().getSupportLoaderManager().initLoader(EARTHQUAKE_LOADER, null, this);//load data
     }
     @Override
@@ -174,11 +175,12 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
 
     @Override
     public void onClusterItemInfoWindowClick(PointItem pointItem) {
-        Bundle args = new Bundle();
+        //Bundle args = new Bundle();
         Intent intent = new Intent(getActivity(), DetailActivity.class);
-        Uri uri = EarthquakesEntry.buildEarthquakesUri(destinationPoint.getId());
+        /*Uri uri = EarthquakesEntry.buildEarthquakesUri(destinationPoint.getId());
         args.putParcelable(DetailActivity.DETAIL_POINT_URI, uri);
-        intent.putExtras(args);
+        intent.putExtras(args);*/
+        intent.setData(EarthquakesEntry.buildEarthquakesUri(destinationPoint.getId()));
         startActivity(intent);
     }
 

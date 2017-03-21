@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 import com.havrylyuk.earthquakes.map.DetailInfoWindowAdapter;
-import com.havrylyuk.earthquakes.map.MarkerInfoWindowAdapter;
 import com.havrylyuk.earthquakes.util.Utility;
 
 
@@ -51,7 +50,8 @@ public class DetailActivity extends BaseActivity  implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        uri =  getIntent().getParcelableExtra(DETAIL_POINT_URI);
+        //uri =  getIntent().getParcelableExtra(DETAIL_POINT_URI);
+        uri =  getIntent().getData();
         appBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         magnitudeView = (TextView) findViewById(R.id.point_magnitude);
         depthView = (TextView) findViewById(R.id.point_depth);
@@ -173,11 +173,6 @@ public class DetailActivity extends BaseActivity  implements
                     getSupportActionBar(). setTitle(getCountry()+", "+ getRegion());
                 }
                 updateUI(magnitude, lat, lng, depth, datetime, location);
-                if (distanceView != null) {
-                    double distance = Utility.distance(new LatLng(lat, lng), new LatLng(
-                            getCurrentLocation().getLatitude(), getCurrentLocation().getLongitude()));
-                    distanceView.setText(String.format("Distance:%s km", distance));
-                }
             } else {
                 Toast.makeText(this,getString(R.string.nothing_found),Toast.LENGTH_SHORT).show();
             }
@@ -200,7 +195,11 @@ public class DetailActivity extends BaseActivity  implements
         if (locationView != null) {
             locationView.setText(getString(R.string.format_location, location));
         }
-
+        if (distanceView != null && getCurrentLocation() != null) {
+            double distance = Utility.distance(new LatLng(lat, lng), new LatLng(
+                      getCurrentLocation().getLatitude(), getCurrentLocation().getLongitude()));
+            distanceView.setText(getString(R.string.format_distance, distance));
+        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) { }

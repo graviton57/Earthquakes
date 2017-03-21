@@ -16,10 +16,10 @@ import com.havrylyuk.earthquakes.R;
  * Created by Igor Havrylyuk on 21.03.2017.
  */
 
-public class MarkerInfoWindowAdapter extends BaseInfoWindowAdapter {
+public class MarkersInfoWindowAdapter extends BaseInfoWindowAdapter {
 
 
-    public MarkerInfoWindowAdapter(Activity context) {
+    public MarkersInfoWindowAdapter(Activity context) {
         super(context);
     }
 
@@ -30,7 +30,7 @@ public class MarkerInfoWindowAdapter extends BaseInfoWindowAdapter {
         TextView markerSnippet = (TextView)view.findViewById(R.id.snippet);
         markerBadge.setImageResource(R.drawable.earthquake_yellow);
         if (!TextUtils.isEmpty(marker.getTitle())) {
-            markerTitle.setText(context.getString(R.string.format_adapter_earthquake, marker.getTitle()));
+            markerTitle.setText(context.getString(R.string.format_earthquake_title, marker.getTitle()));
         }
         int startClickLength = context.getString(R.string.click_detail).length();
         if (!TextUtils.isEmpty(marker.getSnippet())) {

@@ -69,8 +69,8 @@ public class ClusterRenderer extends DefaultClusterRenderer<PointItem> {
         imageView.setImageResource(item.getIcon());
         Bitmap icon = iconGenerator.makeIcon();
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon))
-                .title(context.getString(R.string.app_name))
-                .snippet(item.getLocation());
+                .title(context.getString(R.string.format_adapter_earthquake, item.getMagnitude()) )
+                .snippet(context.getString(R.string.format_station_title, item.getSrc()));
     }
 
     @Override

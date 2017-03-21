@@ -15,6 +15,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         buildConfigField "String", "BASE_GEONAME_URL", "\"$BASE_GEONAME_URL\""
         buildConfigField "String", "GEONAME_API_KEY", "\"$GEONAME_API_KEY\""
+        resValue "string", "GOOGLE_MAPS_DEBUG_API_KEY", "\"$GOOGLE_MAPS_DEBUG_API_KEY\""
     }
     buildTypes {
         release {
@@ -44,5 +45,4 @@ dependencies {
     compile "com.facebook.fresco:fresco:$frescoVersion"
 
     testCompile "junit:junit:$junitVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
