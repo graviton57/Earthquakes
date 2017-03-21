@@ -1,4 +1,4 @@
-package com.havrylyuk.earthquakes;
+package com.havrylyuk.earthquakes.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.havrylyuk.earthquakes.BuildConfig;
+import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.CountriesEntry;
 import com.havrylyuk.earthquakes.model.BoundingBox;
 import com.havrylyuk.earthquakes.service.EarthquakesService;
@@ -44,20 +46,30 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private static final int BASE_LOADER = 10;
     private static final int PERMISSIONS_REQUEST_LOCATION = 101;
 
-    GoogleApiClient googleApiClient;
-    Location currentLocation;
-    private String countryCode;
+    private GoogleApiClient googleApiClient;
+    private Location currentLocation;
+    private String countryCode, country, region ,currentCity;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayout());
-        if (savedInstanceState == null) {
-            askForPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSIONS_REQUEST_LOCATION);
-        }
+        askForPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSIONS_REQUEST_LOCATION);
     }
 
     protected abstract int getLayout();
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public String getCurrentCity() {
+        return currentCity;
+    }
 
     public Location getCurrentLocation() {
         return currentLocation;
@@ -142,10 +154,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         try {
             addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (addresses != null && addresses.size() > 0) {
-                String country = addresses.get(0).getCountryName();
+                country = addresses.get(0).getCountryName();
                 countryCode = addresses.get(0).getCountryCode();
-                String region = addresses.get(0).getAdminArea();
-                String currentCity = addresses.get(0).getLocality();
+                region = addresses.get(0).getAdminArea();
+                currentCity = addresses.get(0).getLocality();
                 String currentAddress = addresses.get(0).getAddressLine(0);
                 if (BuildConfig.DEBUG){
                     Log.d(LOG_TAG, "updateCurrentLocation:You current country code=" +

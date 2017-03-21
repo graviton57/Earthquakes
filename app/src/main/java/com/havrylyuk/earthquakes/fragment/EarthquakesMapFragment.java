@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.havrylyuk.earthquakes.MainActivity;
+import com.havrylyuk.earthquakes.activity.MainActivity;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.activity.DetailActivity;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
@@ -152,17 +152,6 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
         clusterManager.setOnClusterInfoWindowClickListener(this);
         clusterManager.getMarkerCollection()
                 .setOnInfoWindowAdapter( new MarkerInfoWindowAdapter(getActivity()));
-       /* if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
-                map.setMyLocationEnabled(true);
-            }
-        }
-        else {
-            buildGoogleApiClient();
-            map.setMyLocationEnabled(true);
-        }*/
         getActivity().getSupportLoaderManager().initLoader(EARTHQUAKE_LOADER, null, this);//load data
     }
     @Override

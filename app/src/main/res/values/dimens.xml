@@ -8,4 +8,6 @@
     <dimen name="badge_icon">40dp</dimen>
     <dimen name="custom_point_image">48dp</dimen>
     <dimen name="custom_point_padding">2dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="app_bar_height">400dp</dimen>
 </resources>

@@ -21,7 +21,7 @@ public class Utility {
         return isNetworkAvailable;
     }
 
-    private static double distance(LatLng point1, LatLng point2) {
+    public static double distance(LatLng point1, LatLng point2) {
         return computeDistanceBetween(point1, point2) / 1000;//km
     }
 }

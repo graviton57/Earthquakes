@@ -11,5 +11,13 @@
     <string name="click_detail">Click for details</string>
     <string name="self_position">Current Position</string>
     <string name="nothing_found">Nothing found!</string>
+    <!-- Detail Activity -->
     <string name="format_found_points">Found <xliff:g id="code">%1$s</xliff:g> points!</string>
+    <string name="format_cord">Latitude:<xliff:g id="lng">%1.2f</xliff:g> Longitude:<xliff:g id="lat">%2.2f</xliff:g></string>
+    <string name="format_time">Time:<xliff:g id="time">%1$s</xliff:g></string>
+    <string name="format_location"><xliff:g id="location">%1$s</xliff:g></string>
+    <string name="format_detail_depth">Depth:<xliff:g id="depth">%1.2f</xliff:g> km</string>
+    <string name="format_distance">Distance:<xliff:g id="distance">%1.2f</xliff:g></string>
+    <string name="format_magnitude"><xliff:g id="magnitude">%1.1f</xliff:g></string>
+
 </resources>

@@ -1,4 +1,4 @@
-package com.havrylyuk.earthquakes;
+package com.havrylyuk.earthquakes.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -6,7 +6,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.view.MenuItem;
 
-import com.google.android.gms.maps.SupportMapFragment;
+import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.fragment.CountriesFragment;
 import com.havrylyuk.earthquakes.fragment.EarthquakesFragment;
 import com.havrylyuk.earthquakes.fragment.EarthquakesMapFragment;

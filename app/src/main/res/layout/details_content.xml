@@ -1,0 +1,92 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.havrylyuk.earthquakes.activity.DetailActivity"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/point_location"
+        style="?android:attr/textAppearanceMedium"
+        android:textColor="@color/colorPrimary"
+        android:layout_height="wrap_content"
+        tools:text="Urkaine, Chernivtsi"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/point_magnitude"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        style="?android:attr/textAppearanceMedium"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_height="wrap_content"
+        tools:text="6.5"
+        android:drawableLeft="@drawable/pulse"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:textStyle="normal|bold"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/point_date_time"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorSecondaryText"
+        android:drawableLeft="@drawable/clock"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        tools:text="Date: 02.02.2017 15:15:25 "
+        android:textIsSelectable="true"
+        android:layout_width="match_parent"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/point_lng_lat"
+        android:drawableLeft="@drawable/map_marker"
+        android:drawablePadding="5dp"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textIsSelectable="true"
+        tools:text="Location: 12 47 15 W 12 47 15 N" />
+
+    <TextView
+        android:id="@+id/point_depth"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:drawableLeft="@drawable/flash"
+        android:drawablePadding="5dp"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorSecondaryText"
+        tools:text="Depth: 15 км "
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/point_distance"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/ruler"
+        android:drawablePadding="5dp"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorSecondaryText"
+        tools:text="Distance: 1580 km"
+        android:layout_width="match_parent"
+        android:textStyle="normal|bold" />
+
+
+</LinearLayout>
