@@ -41,8 +41,8 @@ public class PreferencesHelper {
         return sharedPreferences.getInt(context.getString(R.string.pref_date_key), 0);
     }
 
-    public void setMagnitude(Context context, float magnitude){
-        editor.putFloat(context.getString(R.string.pref_magnitude_key), magnitude);
+    public void setMagnitude(Context context, int magnitude){
+        editor.putInt(context.getString(R.string.pref_magnitude_key), magnitude);
         editor.apply();
     }
 
