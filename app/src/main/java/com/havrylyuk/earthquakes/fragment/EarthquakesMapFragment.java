@@ -41,7 +41,6 @@ import com.havrylyuk.earthquakes.map.PointItem;
 public class EarthquakesMapFragment extends SupportMapFragment implements
         LoaderManager.LoaderCallbacks<Cursor>,
         OnMapReadyCallback,
-       // LocationListener,
         ClusterManager.OnClusterClickListener<PointItem>,
         ClusterManager.OnClusterInfoWindowClickListener<PointItem>,
         ClusterManager.OnClusterItemInfoWindowClickListener<PointItem>{
@@ -80,37 +79,35 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (loader.getId() == EARTHQUAKE_LOADER) {
-            //if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst() && isAdded()) {
                 clusterManager.clearItems();
                 map.clear();
-                lastLocation = ((MainActivity)getActivity()).getCurrentLocation();
-                if (lastLocation != null) {
-                    addLocationMarker(lastLocation);
+                    lastLocation = ((MainActivity)getActivity()).getCurrentLocation();
+                    if (lastLocation != null) {
+                        addLocationMarker(lastLocation);
+                    }
+                    LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
+                    do {
+                        float lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
+                        float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
+                        LatLng point = new LatLng(lat, lng);
+                        PointItem pointItem = new PointItem(point);
+                        pointItem.setId(cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID)));
+                        float m = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
+                        pointItem.setIcon(m >= 5 ? R.drawable.earthquake:R.drawable.earthquake_low);
+                        pointItem.setMagnitude(cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE)));
+                        pointItem.setSrc(cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_SRC)));
+                        latLngBuilder.include(point);
+                        clusterManager.addItem(pointItem);
+                    } while (cursor.moveToNext());
+                    Toast.makeText(getActivity(),
+                            getString(R.string.format_found_points, String.valueOf(cursor.getCount())),
+                            Toast.LENGTH_SHORT).show();
+                    clusterManager.cluster();
+                    LatLngBounds latLngBounds = latLngBuilder.build();
+                    CameraUpdate track = CameraUpdateFactory.newLatLngBounds(latLngBounds, 25);
+                    map.moveCamera(track);
                 }
-                LatLngBounds.Builder latLngBuilder = new LatLngBounds.Builder();
-                do {
-                    float lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
-                    float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
-                    LatLng point = new LatLng(lat, lng);
-                    PointItem pointItem = new PointItem(point);
-                    pointItem.setId(cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID)));
-                    float m = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
-                    pointItem.setIcon(m >= 5 ? R.drawable.earthquake:R.drawable.earthquake_low);
-                    pointItem.setMagnitude(cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE)));
-                    pointItem.setSrc(cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_SRC)));
-                    latLngBuilder.include(point);
-                    clusterManager.addItem(pointItem);
-                } while (cursor.moveToNext());
-                Toast.makeText(getActivity(),
-                        getString(R.string.format_found_points, String.valueOf(cursor.getCount())),
-                        Toast.LENGTH_SHORT).show();
-                clusterManager.cluster();
-                LatLngBounds latLngBounds = latLngBuilder.build();
-                CameraUpdate track = CameraUpdateFactory.newLatLngBounds(latLngBounds, 25);
-                map.moveCamera(track);
-            }
-            //if (progressBar != null) progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -134,7 +131,6 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
         map = googleMap;
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         map.getUiSettings().setMapToolbarEnabled(true);
-        //map.setOnMapClickListener(this);
         clusterManager = new ClusterManager<>(getActivity(), map);
         clusterManager.setRenderer(new ClusterRenderer(getActivity(), map, clusterManager));
         map.setOnCameraIdleListener(clusterManager);
@@ -155,6 +151,7 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
                 .setOnInfoWindowAdapter( new MarkersInfoWindowAdapter(getActivity()));
         getActivity().getSupportLoaderManager().initLoader(EARTHQUAKE_LOADER, null, this);//load data
     }
+
     @Override
     public boolean onClusterClick(Cluster<PointItem> cluster) {
         LatLngBounds.Builder builder = LatLngBounds.builder();
@@ -175,11 +172,7 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
 
     @Override
     public void onClusterItemInfoWindowClick(PointItem pointItem) {
-        //Bundle args = new Bundle();
         Intent intent = new Intent(getActivity(), DetailActivity.class);
-        /*Uri uri = EarthquakesEntry.buildEarthquakesUri(destinationPoint.getId());
-        args.putParcelable(DetailActivity.DETAIL_POINT_URI, uri);
-        intent.putExtras(args);*/
         intent.setData(EarthquakesEntry.buildEarthquakesUri(destinationPoint.getId()));
         startActivity(intent);
     }

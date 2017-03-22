@@ -7,13 +7,13 @@
         android:title="@string/title_map" />
 
     <item
-        android:id="@+id/navigation_countries"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_countries" />
-
-    <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_list"
         android:icon="@drawable/list"
         android:title="@string/title_earthquakes" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/settings"
+        android:title="@string/title_settings" />
 
 </menu>

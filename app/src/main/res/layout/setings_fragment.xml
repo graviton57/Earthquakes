@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:id="@+id/date_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/tv_period"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/download_earthquakes_period"
+            />
+        <RadioButton
+            android:id="@+id/radio_all_years"
+            android:text="@string/all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/radio_last_month"
+            android:text="@string/last_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/radio_last_year"
+            android:text="@string/last_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tv_magnitude"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/download_earthquakes_magnitude"
+        />
+    <TextView
+        android:id="@+id/tv_magnitude_value"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/format_magnitude_value"
+        />
+    <SeekBar
+        android:id="@+id/magnitude_seek_bar"
+        android:max="10"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_apply"
+        android:paddingTop="16dp"
+        android:text="@string/button_apply_title"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
