@@ -56,6 +56,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <Spinner
+        android:padding="16dp"
+        android:id="@+id/spinner_continets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </Spinner>
+
     <Button
         android:id="@+id/button_apply"
         android:paddingTop="16dp"

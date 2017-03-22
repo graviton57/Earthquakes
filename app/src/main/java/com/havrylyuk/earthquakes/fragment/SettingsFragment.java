@@ -1,29 +1,40 @@
 package com.havrylyuk.earthquakes.fragment;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.havrylyuk.earthquakes.R;
+import com.havrylyuk.earthquakes.data.EarthquakesContract.ContinentsEntry;
+import com.havrylyuk.earthquakes.service.EarthquakesService;
 import com.havrylyuk.earthquakes.util.PreferencesHelper;
 
 /**
  * Created by Igor Havrylyuk on 22.03.2017.
  */
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int LOADER_CONTINENT = 5758;
     private DatePeriod selectedPeriod;
     private int magnitude;
     PreferencesHelper pf;
+    private Spinner spinner;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +50,7 @@ public class SettingsFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.setings_fragment,container,false);
         setupRadioGroup(rootView);
         setupSeekBak(rootView);
+        spinner = (Spinner) rootView.findViewById(R.id.spinner_continets);
         Button button = (Button) rootView.findViewById(R.id.button_apply);
         if (button != null) {
             button.setOnClickListener(new View.OnClickListener() {
@@ -47,9 +59,12 @@ public class SettingsFragment extends Fragment {
                     pf.setDate(getActivity(), selectedPeriod.ordinal());
                     pf.setMagnitude(getActivity(), magnitude);
                     Toast.makeText(getActivity(), selectedPeriod +" "+ magnitude, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), EarthquakesService.class);
+                    getActivity().startService(intent);
                 }
             });
         }
+        getActivity().getSupportLoaderManager().initLoader(LOADER_CONTINENT, null, this);
         return rootView;
     }
     
@@ -83,7 +98,7 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-    
+
     private void setupSeekBak(View rootView) {
         final TextView tvMagnitude  =(TextView) rootView.findViewById(R.id.tv_magnitude_value);
         final SeekBar seekBar = (SeekBar) rootView.findViewById(R.id.magnitude_seek_bar);
@@ -106,6 +121,32 @@ public class SettingsFragment extends Fragment {
                 }
             });
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id == LOADER_CONTINENT) {
+            return new CursorLoader(getActivity(), ContinentsEntry.CONTENT_URI, null, null, null, null);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (loader.getId() == LOADER_CONTINENT) {
+            if (data != null && data.moveToFirst() ) {
+                String[] adapterCols = new String[]{ContinentsEntry.COLUMN_CONTINENT_NAME};
+                int[] adapterRowViews = new int[]{android.R.id.text1};
+                SimpleCursorAdapter cursorAdapter =
+                        new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item,
+                                data, adapterCols, adapterRowViews, 0);
+                cursorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(cursorAdapter);
+            }
+        }
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     public enum DatePeriod {

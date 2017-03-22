@@ -26,12 +26,12 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.havrylyuk.earthquakes.data.EarthquakesContract.CountriesEntry;
+import com.havrylyuk.earthquakes.data.EarthquakesContract.ContinentsEntry;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 
 /**
  *
- * Created by Igor Havrylyuk on 08.03.2017.
+ * Created by Igor Havrylyuk on 19.03.2017.
  */
 
 public class EarthquakeProvider extends ContentProvider {
@@ -41,17 +41,17 @@ public class EarthquakeProvider extends ContentProvider {
 
     private GazetteerDBHelper openHelper;
 
-    static final int COUNTRIES = 1000;
-    static final int COUNTRY_WITH_ID = 1001;
+    static final int CONTINENTS = 1000;
+    static final int CONTINENT_WITH_ID = 1001;
     static final int EARTHQUAKES = 1002;
     static final int EARTHQUAKES_WITH_ID = 1003;
 
-    private static final SQLiteQueryBuilder sCountryByIdQueryBuilder;
+    private static final SQLiteQueryBuilder sContinentByIdQueryBuilder;
     private static final SQLiteQueryBuilder sEarthquakeByIdQueryBuilder;
 
     static {
-        sCountryByIdQueryBuilder = new SQLiteQueryBuilder();
-        sCountryByIdQueryBuilder.setTables(CountriesEntry.TABLE_NAME);
+        sContinentByIdQueryBuilder = new SQLiteQueryBuilder();
+        sContinentByIdQueryBuilder.setTables(ContinentsEntry.TABLE_NAME);
 
         sEarthquakeByIdQueryBuilder = new SQLiteQueryBuilder();
         sEarthquakeByIdQueryBuilder.setTables(EarthquakesEntry.TABLE_NAME);
@@ -60,24 +60,24 @@ public class EarthquakeProvider extends ContentProvider {
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = EarthquakesContract.CONTENT_AUTHORITY;
-        matcher.addURI(authority, EarthquakesContract.PATH_COUNTRIES, COUNTRIES);
-        matcher.addURI(authority, EarthquakesContract.PATH_COUNTRIES +"/#", COUNTRY_WITH_ID);
+        matcher.addURI(authority, EarthquakesContract.PATH_CONTINENT, CONTINENTS);
+        matcher.addURI(authority, EarthquakesContract.PATH_CONTINENT +"/#", CONTINENT_WITH_ID);
         matcher.addURI(authority, EarthquakesContract.PATH_EARTHQUAKES, EARTHQUAKES);
         matcher.addURI(authority, EarthquakesContract.PATH_EARTHQUAKES +"/#", EARTHQUAKES_WITH_ID);
         return matcher;
     }
 
-    private static final String countryByIdSelection =
-            CountriesEntry.TABLE_NAME + "." + CountriesEntry._ID + " = ? ";
+    private static final String continentByIdSelection =
+            ContinentsEntry.TABLE_NAME + "." + ContinentsEntry._ID + " = ? ";
 
     private static final String earthquakesByIdSelection =
             EarthquakesEntry.TABLE_NAME + "." + EarthquakesEntry._ID + " = ? ";
 
-    private Cursor getCountryById(Uri uri, String[] projection, String sortOrder) {
-        String selectionId = String.valueOf(CountriesEntry.getIdFromUri(uri));
-        String selection = countryByIdSelection;
+    private Cursor getContinentById(Uri uri, String[] projection, String sortOrder) {
+        String selectionId = String.valueOf(ContinentsEntry.getIdFromUri(uri));
+        String selection = continentByIdSelection;
         String[] selectionArgs = new String[]{selectionId};
-        return sCountryByIdQueryBuilder.query(openHelper.getReadableDatabase(),
+        return sContinentByIdQueryBuilder.query(openHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -115,9 +115,9 @@ public class EarthquakeProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
         switch (match) {
-            case COUNTRIES:
+            case CONTINENTS:
                 rowsDeleted = db.delete(
-                        CountriesEntry.TABLE_NAME, selection, selectionArgs);
+                        ContinentsEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case EARTHQUAKES:
                 rowsDeleted = db.delete(
@@ -136,10 +136,10 @@ public class EarthquakeProvider extends ContentProvider {
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case COUNTRIES:
-                return CountriesEntry.CONTENT_TYPE;
-            case COUNTRY_WITH_ID:
-                return CountriesEntry.CONTENT_ITEM_TYPE;
+            case CONTINENTS:
+                return ContinentsEntry.CONTENT_TYPE;
+            case CONTINENT_WITH_ID:
+                return ContinentsEntry.CONTENT_ITEM_TYPE;
             case EARTHQUAKES:
                 return EarthquakesEntry.CONTENT_TYPE;
             case EARTHQUAKES_WITH_ID:
@@ -155,10 +155,10 @@ public class EarthquakeProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
         switch (match) {
-            case COUNTRIES: {
-                long _id = db.insert(CountriesEntry.TABLE_NAME, null, values);
+            case CONTINENTS: {
+                long _id = db.insert(ContinentsEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = CountriesEntry.buildCountryUri(_id);
+                    returnUri = ContinentsEntry.buildContinentsUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -183,9 +183,9 @@ public class EarthquakeProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            case COUNTRIES: {
+            case CONTINENTS: {
                 retCursor = openHelper.getReadableDatabase().query(
-                        CountriesEntry.TABLE_NAME,
+                        ContinentsEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -195,8 +195,8 @@ public class EarthquakeProvider extends ContentProvider {
                 );
                 break;
             }
-            case COUNTRY_WITH_ID: {
-                retCursor = getCountryById(uri, projection, sortOrder);
+            case CONTINENT_WITH_ID: {
+                retCursor = getContinentById(uri, projection, sortOrder);
                 break;
             }
             case EARTHQUAKES: {
@@ -229,8 +229,8 @@ public class EarthquakeProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsUpdated;
         switch (match) {
-            case COUNTRIES:
-                rowsUpdated = db.update(CountriesEntry.TABLE_NAME, values, selection,
+            case CONTINENTS:
+                rowsUpdated = db.update(ContinentsEntry.TABLE_NAME, values, selection,
                        selectionArgs);
                 break;
             case EARTHQUAKES:
@@ -252,11 +252,11 @@ public class EarthquakeProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int returnCount = 0;
         switch (match) {
-            case COUNTRIES:
+            case CONTINENTS:
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(CountriesEntry.TABLE_NAME, null, value);
+                        long _id = db.insert(ContinentsEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

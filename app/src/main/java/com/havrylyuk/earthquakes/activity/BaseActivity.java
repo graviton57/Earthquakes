@@ -1,9 +1,7 @@
 package com.havrylyuk.earthquakes.activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -11,11 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,9 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.havrylyuk.earthquakes.BuildConfig;
 import com.havrylyuk.earthquakes.R;
-import com.havrylyuk.earthquakes.data.EarthquakesContract.CountriesEntry;
-import com.havrylyuk.earthquakes.model.BoundingBox;
-import com.havrylyuk.earthquakes.service.EarthquakesService;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,11 +32,9 @@ import java.util.Locale;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        GoogleApiClient.OnConnectionFailedListener{
 
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
-    private static final int BASE_LOADER = 10;
     private static final int PERMISSIONS_REQUEST_LOCATION = 101;
 
     private GoogleApiClient googleApiClient;
@@ -165,45 +156,37 @@ public abstract class BaseActivity extends AppCompatActivity implements
                     Log.d(LOG_TAG,"lat="+String.valueOf(location.getLatitude())+
                             "long="+String.valueOf(currentLocation.getLongitude()));
                 }
-                getSupportLoaderManager().initLoader(BASE_LOADER, null, BaseActivity.this);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (id == BASE_LOADER) {
-            return new CursorLoader(this, CountriesEntry.CONTENT_URI,
-                    null,
-                    CountriesEntry.COUNTRY_COUNTRY_CODE + " = ?",
-                    new String[]{countryCode},
-                    null);
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (loader.getId() == BASE_LOADER) {
-            if (data != null && data.moveToFirst()) {
-                Log.d(LOG_TAG, "onLoadFinished " + countryCode);
-                Intent intent = new Intent(this, EarthquakesService.class);
-                intent.setAction(EarthquakesService.ACTION_LOAD_EARTHQUAKES);
-                long id = data.getLong(data.getColumnIndex(CountriesEntry._ID));
-                intent.putExtra(EarthquakesService.EXTRA_COUNTRY_ID, id);
-                BoundingBox box = new BoundingBox();
-                box.setEast(data.getFloat(data.getColumnIndex(CountriesEntry.COUNTRY_EAST)));
-                box.setWest(data.getFloat(data.getColumnIndex(CountriesEntry.COUNTRY_WEST)));
-                box.setNorth(data.getFloat(data.getColumnIndex(CountriesEntry.COUNTRY_NORTH)));
-                box.setSouth(data.getFloat(data.getColumnIndex(CountriesEntry.COUNTRY_SOUTH)));
-                intent.putExtra(EarthquakesService.EXTRA_BOUNDING_BOX, box);
-                startService(intent);
+    public String parseLocation(float latitude, float longitude) {
+        StringBuilder result = new StringBuilder("");
+        Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
+        try {
+            List<Address> addresses  = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && addresses.size() > 0) {
+                if (addresses.get(0).getCountryName() != null) {
+                    result.append(addresses.get(0).getCountryName());
+                }
+                if (addresses.get(0).getAdminArea() != null) {
+                    result.append(",").append(addresses.get(0).getAdminArea());
+                }
+                if (addresses.get(0).getLocality() != null) {
+                    result.append(",").append(addresses.get(0).getLocality());
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.append("Error parse location");
         }
+        if (TextUtils.isEmpty(result.toString())) {
+            result.append("Unknown location");
+        }
+        if (BuildConfig.DEBUG) Log.d(LOG_TAG, "parseLocation: " + result.toString());
+        return result.toString();
     }
 
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
 }

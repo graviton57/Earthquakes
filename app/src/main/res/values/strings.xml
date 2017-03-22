@@ -23,6 +23,7 @@
     <string name="format_magnitude"><xliff:g id="magnitude">%1.1f</xliff:g></string>
 
     <string name="pref_date_key" translatable="false">pref_date_key</string>
+    <string name="pref_continent_key" translatable="false">pref_continent_key</string>
     <string name="pref_magnitude_key" translatable="false">pref_magnitude_key</string>
     <string name="download_earthquakes_period">Download earthquakes for the period:</string>
     <string name="last_month">Last month</string>
@@ -30,6 +31,6 @@
     <string name="all">All</string>
     <string name="button_apply_title">Apply</string>
     <string name="download_earthquakes_magnitude">Download earthquakes with a magnitude greater:</string>
-    <string name="format_magnitude_value"><xliff:g id="magnitude">%1d</xliff:g> of 10</string>
+    <string name="format_magnitude_value"><xliff:g id="magnitude">%1d</xliff:g>+ of 10</string>
 
 </resources>

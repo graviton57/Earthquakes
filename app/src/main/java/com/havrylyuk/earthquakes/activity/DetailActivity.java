@@ -1,13 +1,14 @@
 package com.havrylyuk.earthquakes.activity;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -32,9 +33,8 @@ import com.havrylyuk.earthquakes.util.Utility;
 
 
 public class DetailActivity extends BaseActivity  implements
-        OnMapReadyCallback {
+        OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String DETAIL_POINT_URI = "com.havrylyuk.earthquakes.DETAIL_POINT_URI";
     private static final int DETAIL_LOADER = 5151;
     private Uri uri;
     private CollapsingToolbarLayout appBarLayout;
@@ -46,11 +46,11 @@ public class DetailActivity extends BaseActivity  implements
     private TextView distanceView;
     private GoogleMap map;
     private float magnitude;
+    String location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //uri =  getIntent().getParcelableExtra(DETAIL_POINT_URI);
         uri =  getIntent().getData();
         appBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         magnitudeView = (TextView) findViewById(R.id.point_magnitude);
@@ -93,13 +93,23 @@ public class DetailActivity extends BaseActivity  implements
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("deprecation")
     private void initFabFavorite() {
         FloatingActionButton share = (FloatingActionButton) findViewById(R.id.fab_share);
         if (share != null) {
             share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(DetailActivity.this,"Share",Toast.LENGTH_SHORT).show();
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                    } else {
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                    }
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, location + " Magnitude:" + magnitude);
+                    startActivity(shareIntent);
+
                 }
             });
         }
@@ -121,7 +131,6 @@ public class DetailActivity extends BaseActivity  implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -156,21 +165,20 @@ public class DetailActivity extends BaseActivity  implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (loader.getId() == DETAIL_LOADER) {
             if (cursor != null && cursor.moveToFirst()) {
-                int pointId = cursor.getInt(cursor.getColumnIndex(EarthquakesEntry._ID));
                 magnitude = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
                 float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
                 float lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
-                String location = getCountry() + "," + getRegion() + ", " + getCurrentCity();
+                location = parseLocation(lat, lng);
                 double depth  = cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_DEPTH));
                 String datetime  = cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_DATE_TIME));
                 String src  = cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_SRC));
                 addMarker(lat,lng);
                 if (appBarLayout != null) {
-                    appBarLayout.setTitle(getCountry()+", "+ getRegion());
+                    appBarLayout.setTitle(location);
                     appBarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
                     appBarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
                 } else if (getSupportActionBar() != null) {
-                    getSupportActionBar(). setTitle(getCountry()+", "+ getRegion());
+                    getSupportActionBar(). setTitle(location);
                 }
                 updateUI(magnitude, lat, lng, depth, datetime, location);
             } else {

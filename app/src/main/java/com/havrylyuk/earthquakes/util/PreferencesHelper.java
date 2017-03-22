@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.havrylyuk.earthquakes.EarthquakeApp;
 import com.havrylyuk.earthquakes.R;
+import com.havrylyuk.earthquakes.fragment.SettingsFragment.DatePeriod;
 
 
 /**
@@ -13,6 +14,9 @@ import com.havrylyuk.earthquakes.R;
  */
 
 public class PreferencesHelper {
+
+    public static final int DEFAULT_MAGNITUDE_VALUE = 3;
+    public static final int DEFAULT_CONTINENT_ID = 6255148;//Europe
 
     private static PreferencesHelper sInstance = null;
     private SharedPreferences sharedPreferences;
@@ -38,7 +42,7 @@ public class PreferencesHelper {
 
     //for the loading of data from SharedPreferences
     public int getDate(Context context){
-        return sharedPreferences.getInt(context.getString(R.string.pref_date_key), 0);
+        return sharedPreferences.getInt(context.getString(R.string.pref_date_key), DatePeriod.LAST_MONTH.ordinal());
     }
 
     public void setMagnitude(Context context, int magnitude){
@@ -47,7 +51,17 @@ public class PreferencesHelper {
     }
 
     public int getMagnitude(Context context){
-        return sharedPreferences.getInt(context.getString(R.string.pref_magnitude_key), 3);
+        return sharedPreferences.getInt(context.getString(R.string.pref_magnitude_key),
+                DEFAULT_MAGNITUDE_VALUE);
     }
 
+    public long getContinent(Context context){
+        return sharedPreferences.getLong(context.getString(R.string.pref_continent_key),
+                DEFAULT_CONTINENT_ID);
+    }
+
+    public void setContinent(Context context, long continentId){
+        editor.putLong(context.getString(R.string.pref_continent_key), continentId);
+        editor.apply();
+    }
 }
