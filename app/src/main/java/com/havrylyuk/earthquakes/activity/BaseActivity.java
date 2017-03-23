@@ -50,18 +50,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected abstract int getLayout();
 
-    public String getCountry() {
-        return country;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public String getCurrentCity() {
-        return currentCity;
-    }
-
     public Location getCurrentLocation() {
         return currentLocation;
     }
