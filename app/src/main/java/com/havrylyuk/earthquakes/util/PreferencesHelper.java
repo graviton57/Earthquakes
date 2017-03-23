@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 
 import com.havrylyuk.earthquakes.EarthquakeApp;
 import com.havrylyuk.earthquakes.R;
-import com.havrylyuk.earthquakes.fragment.SettingsFragment.DatePeriod;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 /**
@@ -19,6 +22,7 @@ public class PreferencesHelper {
     public static final int DEFAULT_CONTINENT_ID = 6255148;//Europe
 
     private static PreferencesHelper sInstance = null;
+    private final SimpleDateFormat simpleDateFormat;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
@@ -32,17 +36,19 @@ public class PreferencesHelper {
     public PreferencesHelper() {
         this.sharedPreferences = EarthquakeApp.getSharedPreferences();
         this.editor = this.sharedPreferences.edit();
+        this.simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     //for save data in SharedPreferences
-    public void setDate(Context context,  int date){
-        editor.putInt(context.getString(R.string.pref_date_key), date);
+    public void setDate(Context context,  String date){
+        editor.putString(context.getString(R.string.pref_date_key), date);
         editor.apply();
     }
 
     //for the loading of data from SharedPreferences
-    public int getDate(Context context){
-        return sharedPreferences.getInt(context.getString(R.string.pref_date_key), DatePeriod.LAST_MONTH.ordinal());
+    public String getDate(Context context){
+        return sharedPreferences.getString(context.getString(R.string.pref_date_key),
+                simpleDateFormat.format(new Date()));
     }
 
     public void setMagnitude(Context context, int magnitude){

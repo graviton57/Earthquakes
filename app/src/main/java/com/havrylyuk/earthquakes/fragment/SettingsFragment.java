@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -17,7 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.RadioGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -32,14 +33,10 @@ import com.havrylyuk.earthquakes.util.PreferencesHelper;
  * Created by Igor Havrylyuk on 22.03.2017.
  */
 
-public class SettingsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SettingsFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public enum DatePeriod {
-        ALL,
-        LAST_WEEK,
-        LAST_MONTH,
-        LAST_YEAR,
-    }
+
 
     private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
     private static final int LOADER_CONTINENT = 5758;
@@ -48,7 +45,7 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
     private PreferencesHelper prefHelper;
 
     private int magnitude;
-    private DatePeriod selectedPeriod;
+    private String selectedDate;
     private long continentId;
 
 
@@ -57,7 +54,7 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         prefHelper = PreferencesHelper.getInstance();
-        selectedPeriod = DatePeriod.values()[prefHelper.getDate(getActivity())];
+        selectedDate = prefHelper.getDate(getActivity());
         magnitude = prefHelper.getMagnitude(getActivity());
         continentId = prefHelper.getContinent(getActivity());
     }
@@ -66,7 +63,7 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.setings_fragment,container,false);
-        setupRadioGroup(rootView);
+        setupDateView(rootView);
         setupSeekBak(rootView);
         setupSpinner(rootView);
         getActivity().getSupportLoaderManager().initLoader(LOADER_CONTINENT, null, this);
@@ -84,10 +81,10 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_apply:
-                prefHelper.setDate(getActivity(), selectedPeriod.ordinal());
+                prefHelper.setDate(getActivity(), selectedDate);
                 prefHelper.setMagnitude(getActivity(), magnitude);
                 prefHelper.setContinent(getActivity(), continentId);
-                Toast.makeText(getActivity(), selectedPeriod +" "+ magnitude, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), selectedDate +" "+ magnitude, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), EarthquakesService.class);
                 getActivity().startService(intent);
                 return false;
@@ -115,35 +112,21 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
         });
     }
 
-    private void setupRadioGroup(View rootView) {
-        RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.date_radio_group);
-        switch (selectedPeriod) {
-            case ALL:
-                radioGroup.check(R.id.radio_all_years);
-                break;
-            case LAST_MONTH:
-                radioGroup.check(R.id.radio_last_month);
-                break;
-            case LAST_YEAR:
-                radioGroup.check(R.id.radio_last_year);
-                break;
+    private void setupDateView(View rootView) {
+        TextView tvDate = (TextView) rootView.findViewById(R.id.tv_selected_date);
+        if (tvDate != null) {
+            tvDate.setText(selectedDate);
         }
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
-                    case R.id.radio_all_years:
-                        selectedPeriod = DatePeriod.ALL;
-                        break;
-                    case R.id.radio_last_month:
-                        selectedPeriod = DatePeriod.LAST_MONTH;
-                        break;
-                    case R.id.radio_last_year:
-                        selectedPeriod = DatePeriod.LAST_YEAR;
-                        break;
+        Button dateButton = (Button) rootView.findViewById(R.id.select_date_button);
+        if (dateButton != null) {
+            dateButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogFragment newFragment = new DatePickerFragment();
+                    newFragment.show(getFragmentManager(),"Date Picker");
                 }
-            }
-        });
+            });
+        }
     }
 
     private void setupSeekBak(View rootView) {

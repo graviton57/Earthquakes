@@ -10,11 +10,9 @@ import android.util.Log;
 import com.havrylyuk.earthquakes.BuildConfig;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.ContinentsEntry;
-import com.havrylyuk.earthquakes.fragment.SettingsFragment;
 import com.havrylyuk.earthquakes.model.Earthquake;
 import com.havrylyuk.earthquakes.model.Earthquakes;
 import com.havrylyuk.earthquakes.util.PreferencesHelper;
-import com.havrylyuk.earthquakes.util.Utility;
 
 import java.io.IOException;
 
@@ -52,7 +50,7 @@ public class EarthquakesService extends IntentService {
     private void loadData() {
         long continentId = pf.getContinent(this);
         int minMagnitude = pf.getMagnitude(this);
-        String date = Utility.convertDate(SettingsFragment.DatePeriod.values()[pf.getDate(this)]);
+        String date = pf.getDate(this);
         String selection = continentId == -1 ? null : ContinentsEntry.COLUMN_CONTINENT_GEONAMEID + " = ?";
         String[] selectionArgs = continentId == -1 ? null : new String[]{String.valueOf(continentId)};
         final Cursor cursor = getContentResolver().query(ContinentsEntry.CONTENT_URI,
@@ -76,7 +74,7 @@ public class EarthquakesService extends IntentService {
                                  float west, int minMagnitude, String date) {
         try {
             long inserted = 0;
-            if (BuildConfig.DEBUG) Log.v( LOG_TAG, "Begin load Earthquakes:continentId="
+            Log.v( LOG_TAG, "Begin load Earthquakes:continentId="
                     +continentId + " minMag="+minMagnitude+" date=" + date);
             ApiService service = ApiClient.getClient().create(ApiService.class);
             Call<Earthquakes> responseCall = service.getEarthquakes(north, south, east, west,
@@ -89,7 +87,7 @@ public class EarthquakesService extends IntentService {
                 }
                 inserted = getContentResolver().bulkInsert(EarthquakesEntry.CONTENT_URI, contentValues);
             }
-            if (BuildConfig.DEBUG) Log.v(LOG_TAG, "End load Earthquakes insert=" + inserted);
+            Log.v(LOG_TAG, "End load Earthquakes insert=" + inserted);
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }

@@ -25,12 +25,13 @@
     <string name="pref_date_key" translatable="false">pref_date_key</string>
     <string name="pref_continent_key" translatable="false">pref_continent_key</string>
     <string name="pref_magnitude_key" translatable="false">pref_magnitude_key</string>
-    <string name="download_earthquakes_period">Download earthquakes for the period:</string>
+    <string name="download_earthquakes_period">Show earthquakes older or equal the given date:</string>
     <string name="last_month">Last month</string>
     <string name="last_year">Last year</string>
     <string name="all">All</string>
     <string name="menu_title_apply">Apply</string>
     <string name="download_earthquakes_magnitude">Download earthquakes with a magnitude greater:</string>
     <string name="format_magnitude_value"><xliff:g id="magnitude">%1d</xliff:g>+ of 10</string>
+    <string name="select_date_title">Select Date</string>
 
 </resources>

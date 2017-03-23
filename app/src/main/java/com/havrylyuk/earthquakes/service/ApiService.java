@@ -14,6 +14,7 @@ public interface ApiService {
 
     // Ukraine date : date of earthquakes 'yyyy-MM-dd'
     // http://api.geonames.org/earthquakesJSON?north=52.369362&south=44.390415&east=40.20739&west=22.128889&username=graviton57&maxRows=500
+    // http://api.geonames.org/earthquakesJSON?north=52.369362&south=44.390415&east=40.20739&west=22.128889&date=2017-03-23&date=2017-02-23&username=graviton57&maxRows=500
     @GET("earthquakesJSON")
     Call<Earthquakes> getEarthquakes(
             @Query("north")        float north,
