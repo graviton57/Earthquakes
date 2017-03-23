@@ -29,7 +29,7 @@
     <string name="last_month">Last month</string>
     <string name="last_year">Last year</string>
     <string name="all">All</string>
-    <string name="button_apply_title">Apply</string>
+    <string name="menu_title_apply">Apply</string>
     <string name="download_earthquakes_magnitude">Download earthquakes with a magnitude greater:</string>
     <string name="format_magnitude_value"><xliff:g id="magnitude">%1d</xliff:g>+ of 10</string>
 

@@ -9,10 +9,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -30,44 +34,87 @@ import com.havrylyuk.earthquakes.util.PreferencesHelper;
 
 public class SettingsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public enum DatePeriod {
+        ALL,
+        LAST_WEEK,
+        LAST_MONTH,
+        LAST_YEAR,
+    }
+
+    private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
     private static final int LOADER_CONTINENT = 5758;
-    private DatePeriod selectedPeriod;
-    private int magnitude;
-    PreferencesHelper pf;
     private Spinner spinner;
+
+    private PreferencesHelper prefHelper;
+
+    private int magnitude;
+    private DatePeriod selectedPeriod;
+    private long continentId;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pf = PreferencesHelper.getInstance();
-        selectedPeriod = DatePeriod.values()[pf.getDate(getActivity())];
-        magnitude = pf.getMagnitude(getActivity());
+        setHasOptionsMenu(true);
+        prefHelper = PreferencesHelper.getInstance();
+        selectedPeriod = DatePeriod.values()[prefHelper.getDate(getActivity())];
+        magnitude = prefHelper.getMagnitude(getActivity());
+        continentId = prefHelper.getContinent(getActivity());
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.setings_fragment,container,false);
         setupRadioGroup(rootView);
         setupSeekBak(rootView);
-        spinner = (Spinner) rootView.findViewById(R.id.spinner_continets);
-        Button button = (Button) rootView.findViewById(R.id.button_apply);
-        if (button != null) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    pf.setDate(getActivity(), selectedPeriod.ordinal());
-                    pf.setMagnitude(getActivity(), magnitude);
-                    Toast.makeText(getActivity(), selectedPeriod +" "+ magnitude, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getActivity(), EarthquakesService.class);
-                    getActivity().startService(intent);
-                }
-            });
-        }
+        setupSpinner(rootView);
         getActivity().getSupportLoaderManager().initLoader(LOADER_CONTINENT, null, this);
         return rootView;
     }
-    
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_settings, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_apply:
+                prefHelper.setDate(getActivity(), selectedPeriod.ordinal());
+                prefHelper.setMagnitude(getActivity(), magnitude);
+                prefHelper.setContinent(getActivity(), continentId);
+                Toast.makeText(getActivity(), selectedPeriod +" "+ magnitude, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), EarthquakesService.class);
+                getActivity().startService(intent);
+                return false;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    private void setupSpinner(View rootView) {
+        spinner = (Spinner) rootView.findViewById(R.id.spinner_continets);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                String continent = cursor.getString(cursor.getColumnIndex(ContinentsEntry.COLUMN_CONTINENT_NAME));
+                continentId = cursor.getLong(cursor.getColumnIndex(ContinentsEntry.COLUMN_CONTINENT_GEONAMEID));
+                Log.d(LOG_TAG,"Position ="+position+" value="+continent + " id="+continentId+ " adapter id="+ id);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     private void setupRadioGroup(View rootView) {
         RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.date_radio_group);
         switch (selectedPeriod) {
@@ -134,7 +181,7 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader.getId() == LOADER_CONTINENT) {
-            if (data != null && data.moveToFirst() ) {
+            if (data != null  ) {
                 String[] adapterCols = new String[]{ContinentsEntry.COLUMN_CONTINENT_NAME};
                 int[] adapterRowViews = new int[]{android.R.id.text1};
                 SimpleCursorAdapter cursorAdapter =
@@ -142,6 +189,9 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
                                 data, adapterCols, adapterRowViews, 0);
                 cursorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(cursorAdapter);
+                int index = getIndex(spinner, ContinentsEntry.COLUMN_CONTINENT_GEONAMEID, continentId);
+                Log.d(LOG_TAG, "found index=" + index);
+                spinner.setSelection(index);
             }
         }
     }
@@ -149,10 +199,19 @@ public class SettingsFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoaderReset(Loader<Cursor> loader) {
     }
 
-    public enum DatePeriod {
-
-        ALL,
-        LAST_MONTH,
-        LAST_YEAR,
+    private int getIndex(Spinner spinner, String columnName, long index) {
+        if (index <= 0 || spinner.getCount() == 0) {
+            return -1; // Not found
+        } else {
+            Cursor cursor = (Cursor) spinner.getItemAtPosition(0);
+            for (int i = 0; i < spinner.getCount(); i++) {
+                cursor.moveToPosition(i);
+                long id = cursor.getLong(cursor.getColumnIndex(columnName));
+                if (id ==index) {
+                    return i;
+                }
+            }
+            return -1; // Not found
+        }
     }
 }
