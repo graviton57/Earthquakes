@@ -4,11 +4,9 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
-import android.widget.TextView;
-
-import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.util.PreferencesHelper;
 
 import java.text.ParseException;
@@ -23,8 +21,27 @@ import java.util.Locale;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
+    public static final String DATE_PICKER_TAG = "DATE_PICKER_TAG";
+
+    public interface OnChangeDateListener{
+        void onChangeDate(String newDate);
+    }
+
     private Date date;
-    SimpleDateFormat format;
+    private SimpleDateFormat format;
+    private OnChangeDateListener listener;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            listener = (OnChangeDateListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Calling Fragment  must "
+                    +"implement DatePickerFragment OnChangeDateListener");
+        }
+    }
 
     @NonNull
     @Override
@@ -45,9 +62,10 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        TextView tv = (TextView) getActivity().findViewById(R.id.tv_selected_date);
-        if (tv != null) {
-            tv.setText(format.format(date));
+        if (listener != null) {
+            final Calendar c = Calendar.getInstance();
+            c.set(year, month, day);
+            listener.onChangeDate(format.format(c.getTime()));
         }
     }
 

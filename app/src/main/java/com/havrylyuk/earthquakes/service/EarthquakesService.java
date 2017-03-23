@@ -102,7 +102,7 @@ public class EarthquakesService extends IntentService {
         cv.put(EarthquakesEntry.EARTH_SRC, earthquake.getSrc());
         cv.put(EarthquakesEntry.EARTH_LAT, earthquake.getLat());
         cv.put(EarthquakesEntry.EARTH_LNG, earthquake.getLng());
-        cv.put(EarthquakesEntry.EARTH_COUNTRY_ID, continentId);
+        cv.put(EarthquakesEntry.EARTH_CONTINENT_ID, continentId);
         return cv;
     }
 }

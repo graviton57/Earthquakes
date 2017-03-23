@@ -8,9 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -29,12 +27,15 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.havrylyuk.earthquakes.activity.MainActivity;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.activity.DetailActivity;
+import com.havrylyuk.earthquakes.data.EarthquakesContract.ContinentsEntry;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 import com.havrylyuk.earthquakes.map.ClusterRenderer;
 import com.havrylyuk.earthquakes.map.MarkersInfoWindowAdapter;
 import com.havrylyuk.earthquakes.map.PointItem;
+import com.havrylyuk.earthquakes.util.PreferencesHelper;
 
 /**
+ *
  * Created by Igor Havrylyuk on 20.03.2017.
  */
 
@@ -50,28 +51,33 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
     private ClusterManager<PointItem> clusterManager;
     private PointItem destinationPoint; //destination position
     private Marker currLocationMarker;//original user position
-    private Location lastLocation;
+    private PreferencesHelper prefHelper;
 
     public EarthquakesMapFragment() {
     }
 
-    @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return super.onCreateView(layoutInflater, viewGroup, bundle);
-    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        prefHelper = PreferencesHelper.getInstance();
         getMapAsync(this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == EARTHQUAKE_LOADER) {
-            return new CursorLoader(getActivity(),
+            int magnitude = prefHelper.getMagnitude(getActivity());
+            String date  = prefHelper.getDate(getActivity());
+            long continentId  = prefHelper.getContinent(getActivity());
+
+            return new CursorLoader(
+                    getActivity(),
                     EarthquakesEntry.CONTENT_URI,
-                    null, null, null, null);
+                    null,
+                    null,
+                    null,
+                    null);
         }
         return null;
     }
@@ -82,7 +88,7 @@ public class EarthquakesMapFragment extends SupportMapFragment implements
             if (cursor != null && cursor.moveToFirst() && isAdded()) {
                 clusterManager.clearItems();
                 map.clear();
-                    lastLocation = ((MainActivity)getActivity()).getCurrentLocation();
+                Location lastLocation = ((MainActivity) getActivity()).getCurrentLocation();
                     if (lastLocation != null) {
                         addLocationMarker(lastLocation);
                     }

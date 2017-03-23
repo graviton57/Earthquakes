@@ -73,7 +73,7 @@ public class EarthquakesContract {
         // Table name
         public static final String TABLE_NAME = "earthquakes";
 
-        public static final String EARTH_COUNTRY_ID = "country_id";
+        public static final String EARTH_CONTINENT_ID = "continent_id";
         public static final String EARTH_DATE_TIME  = "datetime";
         public static final String EARTH_DEPTH      = "depth";
         public static final String EARTH_LNG        = "lng";

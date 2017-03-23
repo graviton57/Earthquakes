@@ -78,7 +78,7 @@ public class GazetteerDBHelper extends SQLiteOpenHelper {
     private final String SQL_CREATE_EARTHQUAKES_TABLE = "CREATE TABLE " +
             EarthquakesEntry.TABLE_NAME + " (" +
             EarthquakesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            EarthquakesEntry.EARTH_COUNTRY_ID + " INTEGER NOT NULL , " +
+            EarthquakesEntry.EARTH_CONTINENT_ID + " INTEGER NOT NULL , " +
             EarthquakesEntry.EARTH_DATE_TIME + " TEXT NOT NULL DEFAULT '', " +
             EarthquakesEntry.EARTH_DEPTH + " REAL NOT NULL DEFAULT 0 , " +
             EarthquakesEntry.EARTH_LNG + " REAL NOT NULL DEFAULT 0, " +

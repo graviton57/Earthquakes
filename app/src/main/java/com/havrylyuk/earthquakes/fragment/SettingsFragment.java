@@ -30,24 +30,23 @@ import com.havrylyuk.earthquakes.service.EarthquakesService;
 import com.havrylyuk.earthquakes.util.PreferencesHelper;
 
 /**
+ *
  * Created by Igor Havrylyuk on 22.03.2017.
  */
 
 public class SettingsFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        DatePickerFragment.OnChangeDateListener {
 
-
-
-    private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
     private static final int LOADER_CONTINENT = 5758;
     private Spinner spinner;
+    private TextView tvDate;
 
     private PreferencesHelper prefHelper;
 
     private int magnitude;
     private String selectedDate;
     private long continentId;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +68,6 @@ public class SettingsFragment extends Fragment
         getActivity().getSupportLoaderManager().initLoader(LOADER_CONTINENT, null, this);
         return rootView;
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -100,9 +98,8 @@ public class SettingsFragment extends Fragment
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                String continent = cursor.getString(cursor.getColumnIndex(ContinentsEntry.COLUMN_CONTINENT_NAME));
-                continentId = cursor.getLong(cursor.getColumnIndex(ContinentsEntry.COLUMN_CONTINENT_GEONAMEID));
-                Log.d(LOG_TAG,"Position ="+position+" value="+continent + " id="+continentId+ " adapter id="+ id);
+                continentId = cursor.getLong(cursor
+                        .getColumnIndex(ContinentsEntry.COLUMN_CONTINENT_GEONAMEID));
             }
 
             @Override
@@ -113,7 +110,7 @@ public class SettingsFragment extends Fragment
     }
 
     private void setupDateView(View rootView) {
-        TextView tvDate = (TextView) rootView.findViewById(R.id.tv_selected_date);
+        tvDate = (TextView) rootView.findViewById(R.id.tv_selected_date);
         if (tvDate != null) {
             tvDate.setText(selectedDate);
         }
@@ -122,8 +119,9 @@ public class SettingsFragment extends Fragment
             dateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DialogFragment newFragment = new DatePickerFragment();
-                    newFragment.show(getFragmentManager(),"Date Picker");
+                    DialogFragment datePickerFragment = new DatePickerFragment();
+                    datePickerFragment.setTargetFragment(SettingsFragment.this, 0);
+                    datePickerFragment.show(getFragmentManager(),DatePickerFragment.DATE_PICKER_TAG);
                 }
             });
         }
@@ -131,7 +129,7 @@ public class SettingsFragment extends Fragment
 
     private void setupSeekBak(View rootView) {
         final TextView tvMagnitude  =(TextView) rootView.findViewById(R.id.tv_magnitude_value);
-        final SeekBar seekBar = (SeekBar) rootView.findViewById(R.id.magnitude_seek_bar);
+        SeekBar seekBar = (SeekBar) rootView.findViewById(R.id.magnitude_seek_bar);
         if (seekBar != null && tvMagnitude != null) {
             seekBar.setProgress(magnitude);
             tvMagnitude.setText(getString(R.string.format_magnitude_value, magnitude));
@@ -156,7 +154,13 @@ public class SettingsFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_CONTINENT) {
-            return new CursorLoader(getActivity(), ContinentsEntry.CONTENT_URI, null, null, null, null);
+            return new CursorLoader(
+                    getActivity(),
+                    ContinentsEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
         }
         return null;
     }
@@ -164,7 +168,7 @@ public class SettingsFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader.getId() == LOADER_CONTINENT) {
-            if (data != null  ) {
+            if (data != null && data.moveToFirst() ) {
                 String[] adapterCols = new String[]{ContinentsEntry.COLUMN_CONTINENT_NAME};
                 int[] adapterRowViews = new int[]{android.R.id.text1};
                 SimpleCursorAdapter cursorAdapter =
@@ -173,7 +177,6 @@ public class SettingsFragment extends Fragment
                 cursorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(cursorAdapter);
                 int index = getIndex(spinner, ContinentsEntry.COLUMN_CONTINENT_GEONAMEID, continentId);
-                Log.d(LOG_TAG, "found index=" + index);
                 spinner.setSelection(index);
             }
         }
@@ -184,7 +187,7 @@ public class SettingsFragment extends Fragment
 
     private int getIndex(Spinner spinner, String columnName, long index) {
         if (index <= 0 || spinner.getCount() == 0) {
-            return -1; // Not found
+            return -1;
         } else {
             Cursor cursor = (Cursor) spinner.getItemAtPosition(0);
             for (int i = 0; i < spinner.getCount(); i++) {
@@ -194,7 +197,14 @@ public class SettingsFragment extends Fragment
                     return i;
                 }
             }
-            return -1; // Not found
+            return -1;
+        }
+    }
+
+    @Override
+    public void onChangeDate(String newDate) {
+        if (tvDate != null) {
+            tvDate.setText(newDate);
         }
     }
 }
