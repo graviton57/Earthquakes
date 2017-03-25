@@ -36,5 +36,6 @@
 
     <string name="error_parse_location">Error parse location</string>
     <string name="unknown_location">Unknown location</string>
+    <string name="no_geocoder_available">No geocoder available!</string>
 
 </resources>

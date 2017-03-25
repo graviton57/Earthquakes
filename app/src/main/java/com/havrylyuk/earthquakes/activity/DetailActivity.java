@@ -1,7 +1,9 @@
 package com.havrylyuk.earthquakes.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -13,6 +15,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -28,14 +31,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
+import com.havrylyuk.earthquakes.event.LocationEvent;
 import com.havrylyuk.earthquakes.map.DetailInfoWindowAdapter;
+import com.havrylyuk.earthquakes.service.LocationService;
 import com.havrylyuk.earthquakes.util.Utility;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 
 public class DetailActivity extends BaseActivity  implements
         OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int DETAIL_LOADER = 5151;
+    private static final String LOG_TAG = DetailActivity.class.getSimpleName();
     private Uri uri;
     private CollapsingToolbarLayout appBarLayout;
     private TextView magnitudeView;
@@ -46,11 +56,16 @@ public class DetailActivity extends BaseActivity  implements
     private TextView distanceView;
     private GoogleMap map;
     private float magnitude;
-    String location;
+    private String location;
+    private float lng;
+    private float lat;
+    private double depth;
+    private String datetime;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         uri =  getIntent().getData();
         appBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         magnitudeView = (TextView) findViewById(R.id.point_magnitude);
@@ -61,6 +76,12 @@ public class DetailActivity extends BaseActivity  implements
         distanceView = (TextView) findViewById(R.id.point_distance);
         initFabFavorite();
         initToolBar();
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override
@@ -109,7 +130,6 @@ public class DetailActivity extends BaseActivity  implements
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_TEXT, location + " Magnitude:" + magnitude);
                     startActivity(shareIntent);
-
                 }
             });
         }
@@ -137,14 +157,8 @@ public class DetailActivity extends BaseActivity  implements
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == DETAIL_LOADER) {
             if ( null != uri ) {
-                return new CursorLoader(
-                        this,
-                        uri,
-                        null,
-                        null,
-                        null,
-                        null
-                );
+                return new CursorLoader(this,
+                        uri, null, null, null, null);
             }
         }
         return null;
@@ -157,8 +171,8 @@ public class DetailActivity extends BaseActivity  implements
         markerOptions.title(getString(R.string.format_magnitude, magnitude));
         markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.earthquake));
         map.addMarker(markerOptions);
-        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, 5);
-        map.animateCamera(location);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 5);
+        map.animateCamera(cameraUpdate);
     }
 
     @Override
@@ -166,21 +180,13 @@ public class DetailActivity extends BaseActivity  implements
         if (loader.getId() == DETAIL_LOADER) {
             if (cursor != null && cursor.moveToFirst()) {
                 magnitude = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_MAGNITUDE));
-                float lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
-                float lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
-                location = parseLocation(lat, lng);
-                double depth  = cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_DEPTH));
-                String datetime  = cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_DATE_TIME));
+                lng = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LNG));
+                lat = cursor.getFloat(cursor.getColumnIndex(EarthquakesEntry.EARTH_LAT));
+                depth  = cursor.getDouble(cursor.getColumnIndex(EarthquakesEntry.EARTH_DEPTH));
+                datetime  = cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_DATE_TIME));
                 String src  = cursor.getString(cursor.getColumnIndex(EarthquakesEntry.EARTH_SRC));
                 addMarker(lat,lng);
-                if (appBarLayout != null) {
-                    appBarLayout.setTitle(location);
-                    appBarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
-                    appBarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
-                } else if (getSupportActionBar() != null) {
-                    getSupportActionBar(). setTitle(location);
-                }
-                updateUI(magnitude, lat, lng, depth, datetime, location);
+                startLocationService(this, new LatLng(lat, lng));
             } else {
                 Toast.makeText(this,getString(R.string.nothing_found),Toast.LENGTH_SHORT).show();
             }
@@ -188,6 +194,13 @@ public class DetailActivity extends BaseActivity  implements
     }
 
     private void updateUI(float magnitude, float lat, float lng, double depth, String datetime, String location) {
+        if (appBarLayout != null) {
+            appBarLayout.setTitle(location);
+            appBarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
+            appBarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
+        } else if (getSupportActionBar() != null) {
+            getSupportActionBar(). setTitle(location);
+        }
         if (magnitudeView != null) {
             magnitudeView.setText(getString(R.string.format_magnitude, magnitude ));
         }
@@ -212,4 +225,21 @@ public class DetailActivity extends BaseActivity  implements
 
     public void onLoaderReset(Loader<Cursor> loader) { }
 
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onEvent(LocationEvent event) {
+        Log.d(LOG_TAG, "LocationEvent location=" + event.getLocation());
+        location = event.getLocation();
+        updateUI(magnitude, lat, lng, depth, datetime, location);
+    }
+
+    public void startLocationService(Context context, LatLng latLng){
+        // Determine whether a Geocoder is available.
+        if (!Geocoder.isPresent()) {
+            Toast.makeText(context, R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent intent = new Intent(context, LocationService.class);
+        intent.putExtra(LocationService.LATLNG_DATA_EXTRA, latLng);
+        context.startService(intent);
+    };
 }

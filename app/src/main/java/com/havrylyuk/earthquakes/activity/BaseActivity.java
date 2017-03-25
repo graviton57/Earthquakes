@@ -2,8 +2,6 @@ package com.havrylyuk.earthquakes.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,10 +17,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.havrylyuk.earthquakes.BuildConfig;
 import com.havrylyuk.earthquakes.R;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 /**
  *
@@ -39,10 +32,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private GoogleApiClient googleApiClient;
     private Location currentLocation;
-    private String countryCode, country, region ,currentCity;
+
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayout());
         askForPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSIONS_REQUEST_LOCATION);
@@ -111,9 +104,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
             currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (currentLocation != null) {
-                updateCurrentLocation(currentLocation);
-            }
         }
      }
 
@@ -125,56 +115,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(LOG_TAG, "onConnectionFailed " + connectionResult.toString());
-    }
-
-    private void updateCurrentLocation(Location location) {
-        Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (addresses != null && addresses.size() > 0) {
-                country = addresses.get(0).getCountryName();
-                countryCode = addresses.get(0).getCountryCode();
-                region = addresses.get(0).getAdminArea();
-                currentCity = addresses.get(0).getLocality();
-                String currentAddress = addresses.get(0).getAddressLine(0);
-                if (BuildConfig.DEBUG){
-                    Log.d(LOG_TAG, "updateCurrentLocation:You current country code=" +
-                            countryCode+ " region="+region +" cityName=" + currentCity+" Address=" + currentAddress);
-                    Log.d(LOG_TAG,"lat="+String.valueOf(location.getLatitude())+
-                            "long="+String.valueOf(currentLocation.getLongitude()));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String parseLocation(float latitude, float longitude) {
-        StringBuilder result = new StringBuilder("");
-        Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
-        try {
-            List<Address> addresses  = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses != null && addresses.size() > 0) {
-                if (addresses.get(0).getCountryName() != null) {
-                    result.append(addresses.get(0).getCountryName());
-                }
-                if (addresses.get(0).getAdminArea() != null) {
-                    result.append(",").append(addresses.get(0).getAdminArea());
-                }
-                if (addresses.get(0).getLocality() != null) {
-                    result.append(",").append(addresses.get(0).getLocality());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            result.append("Error parse location");
-        }
-        if (TextUtils.isEmpty(result.toString())) {
-            result.append("Unknown location");
-        }
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG, "parseLocation: " + result.toString());
-        return result.toString();
     }
 
 }
