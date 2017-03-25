@@ -34,4 +34,7 @@
     <string name="format_magnitude_value"><xliff:g id="magnitude">%1d</xliff:g>+ of 10</string>
     <string name="select_date_title">Select Date</string>
 
+    <string name="error_parse_location">Error parse location</string>
+    <string name="unknown_location">Unknown location</string>
+
 </resources>
