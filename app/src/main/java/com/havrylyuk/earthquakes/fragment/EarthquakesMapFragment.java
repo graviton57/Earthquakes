@@ -27,7 +27,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.havrylyuk.earthquakes.activity.MainActivity;
 import com.havrylyuk.earthquakes.R;
 import com.havrylyuk.earthquakes.activity.DetailActivity;
-import com.havrylyuk.earthquakes.data.EarthquakesContract.ContinentsEntry;
 import com.havrylyuk.earthquakes.data.EarthquakesContract.EarthquakesEntry;
 import com.havrylyuk.earthquakes.map.ClusterRenderer;
 import com.havrylyuk.earthquakes.map.MarkersInfoWindowAdapter;

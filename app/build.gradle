@@ -38,6 +38,8 @@ dependencies {
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
 
+    compile "org.greenrobot:eventbus:$eventBusVersion"
+
     compile "com.google.android.gms:play-services-maps:$playServicesVersion"
     compile "com.google.android.gms:play-services-location:$playServicesVersion"
     compile "com.google.maps.android:android-maps-utils:$mapsUtilsVersion"

@@ -25,13 +25,13 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/AppTheme.NoActionBar"
-            android:name=".activity.DetailActivity">
-        </activity>
+            android:name=".activity.DetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <!-- Providers -->
         <provider
             android:name=".data.EarthquakeProvider"
@@ -40,8 +40,9 @@
             android:exported="false" />
         <!-- Services -->
         <service android:name=".service.EarthquakesService" />
-
-
+        <service
+            android:name=".service.LocationService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
